@@ -21,11 +21,13 @@ public class BoardPanel extends JPanel {
         board.setDragEnabled(false);
 
         // display settings
-        board.setRowHeight(32);
+        board.setDefaultRenderer(Object.class, new CellRenderer());
         board.setIntercellSpacing(new Dimension(0, 0));
         board.setTableHeader(null);
         board.setShowGrid(false);
 
+        // sizing settings
+        board.setRowHeight(32);
         for (int i = 0; i < board.getColumnCount(); i++) {
             TableColumn col = board.getColumnModel().getColumn(i);
 
@@ -33,8 +35,6 @@ public class BoardPanel extends JPanel {
             col.setMaxWidth(32);
             col.setPreferredWidth(32);
         }
-
-        board.setDefaultRenderer(Object.class, new CellRenderer());
 
         add(board);
     }
