@@ -1,8 +1,7 @@
-import controller.ViewController;
+import controller.MenuViewController;
 import model.AppModel;
-import view.MainView;
+import view.MenuView;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
@@ -23,8 +22,8 @@ public class Main {
 
         javax.swing.SwingUtilities.invokeLater(() -> {
             AppModel model = new AppModel();
-            MainView view = new MainView();
-            new ViewController(model, view);
+            MenuView view = new MenuView();
+            new MenuViewController(model, view);
         });
     }
 }

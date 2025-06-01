@@ -1,18 +1,27 @@
 package view;
 
+import model.BoardModel;
+
 import javax.swing.*;
+import java.awt.*;
 
 public class GameView extends JFrame {
+    public JPanel cardPanel;
+    public CardLayout cardLayout;
 
-    public GameView() {
+    public BoardSizePanel boardSizePanel;
+    public BoardPanel boardPanel;
+
+    public GameView(BoardModel boardModel) {
         setTitle("Game");
         setSize(500, 300);
-        setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        JLabel abc = new JLabel("chuj");
-        add(abc);
+        boardPanel = new BoardPanel(boardModel);
+        add(boardPanel);
 
+        pack();
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 }
