@@ -57,6 +57,18 @@ public class BoardModel extends AbstractTableModel {
         board[board.length/2][board[0].length/2] = TileType.PLAYER;
     }
 
+    public int[] getEmptyTileCoords() {
+        for (int row = 0; row < board.length; row++) {
+            for (int col = 0; col < board[0].length; col++) {
+                if (board[row][col] == TileType.EMPTY || board[row][col] == TileType.DOT) {
+                    return new int[]{row, col};
+                }
+            }
+        }
+
+        return new int[]{-1, -1};
+    }
+
     @Override
     public int getRowCount() {
         return rows;

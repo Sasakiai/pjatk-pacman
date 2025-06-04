@@ -14,6 +14,7 @@ public class PacmanThread extends Thread {
     private Object directionLock;
     private int moveInterval = 200;
     private boolean running = true;
+    private volatile boolean canMove = true;
 
     public PacmanThread(BoardModel boardModel, int startRow, int startCol, Object directionLock, GameController gameController) {
         this.boardModel = boardModel;
@@ -35,6 +36,10 @@ public class PacmanThread extends Thread {
         interrupt();
     }
 
+    public void setCanMove(boolean canMove) {
+        this.canMove = canMove;
+    }
+
     @Override
     public void run() {
         while (running) {
@@ -42,6 +47,10 @@ public class PacmanThread extends Thread {
                 Thread.sleep(moveInterval);
             } catch (InterruptedException ex) {
                 if (!running) break;
+            }
+
+            if (!canMove) {
+                continue;
             }
 
             Direction directionCopy;
@@ -78,6 +87,11 @@ public class PacmanThread extends Thread {
                 if (newTile == TileType.WALL) {
                     continue;
                 }
+            }
+
+            if (newTile == TileType.GHOST) {
+                gameController.playerHit();
+                continue;
             }
 
             if (newTile == TileType.DOT) {

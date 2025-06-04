@@ -74,6 +74,9 @@ public class BoardPanel extends JPanel implements KeyListener {
                     case PLAYER:
                         tile.setBackground(Color.YELLOW);
                         break;
+                    case GHOST:
+                        tile.setBackground(Color.RED);
+                        break;
                     default:
                         tile.setBackground(Color.BLACK);
                 }
