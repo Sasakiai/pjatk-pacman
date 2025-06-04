@@ -9,6 +9,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -18,6 +20,8 @@ public class BoardPanel extends JPanel implements KeyListener {
 
     public BoardPanel(BoardModel model, GameController gameController) {
         this.gameController = gameController;
+        setBackground(Color.BLACK);
+
         board = new JTable(model);
 
         // disable any interaction
@@ -31,6 +35,7 @@ public class BoardPanel extends JPanel implements KeyListener {
         board.setIntercellSpacing(new Dimension(0, 0));
         board.setTableHeader(null);
         board.setShowGrid(false);
+        board.setBackground(Color.BLACK);
 
         // sizing settings
         int size = calculateRowColSize();
@@ -43,13 +48,24 @@ public class BoardPanel extends JPanel implements KeyListener {
             col.setPreferredWidth(size);
         }
 
-        add(board);
+        add(board, BorderLayout.CENTER);
         setFocusable(true);
         addKeyListener(this);
+
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                rescaleBoard();
+            }
+        });
     }
 
     private int calculateRowColSize() {
         return 24;
+    }
+
+    private void rescaleBoard() {
+        gameController.rescaleBoard();
     }
 
     private class CellRenderer extends DefaultTableCellRenderer {

@@ -73,9 +73,11 @@ public class GameController {
     }
 
     private void initGhost(int row, int col) {
+        TileType previousTile = boardModel.getTile(row, col);
+
         boardModel.setTile(row, col, TileType.GHOST);
 
-        GhostThread ghost = new GhostThread(boardModel, row, col, this);
+        GhostThread ghost = new GhostThread(boardModel, row, col, previousTile, this);
         ghostThreads.add(ghost);
         ghost.start();
     }
@@ -120,5 +122,9 @@ public class GameController {
 
         gameView.dispose();
         new GameOverView();
+    }
+
+    public void rescaleBoard() {
+        gameView.rescaleBoard();
     }
 }

@@ -12,15 +12,17 @@ public class GhostThread extends Thread {
     private final GameController gameController;
     private int currentRow;
     private int currentCol;
+    private TileType previousTile = TileType.EMPTY;
     private final Random random = new Random();
     private int moveInterval = 400;
     private boolean running = true;
 
-    public GhostThread(BoardModel boardModel, int startRow, int startCol, GameController gameController) {
+    public GhostThread(BoardModel boardModel, int startRow, int startCol, TileType previousTile, GameController gameController) {
         this.boardModel = boardModel;
         this.gameController = gameController;
         this.currentRow = startRow;
         this.currentCol = startCol;
+        this.previousTile = previousTile;
     }
 
     public void stopThread() {
@@ -68,8 +70,10 @@ public class GhostThread extends Thread {
                     gameController.playerHit();
                 }
 
-                boardModel.setTile(currentRow, currentCol, TileType.EMPTY);
+                boardModel.setTile(currentRow, currentCol, previousTile);
+                previousTile = (newTile == TileType.DOT ? newTile : TileType.EMPTY);
                 boardModel.setTile(newRow, newCol, TileType.GHOST);
+
 
                 currentRow = newRow;
                 currentCol = newCol;

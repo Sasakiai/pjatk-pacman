@@ -35,4 +35,8 @@ public class GameView extends JFrame {
 
         boardPanel.requestFocusInWindow();
     }
+
+    public void rescaleBoard() {
+        pack();
+    }
 }
