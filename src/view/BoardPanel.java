@@ -1,5 +1,7 @@
 package view;
 
+import controller.GameController;
+import enums.Direction;
 import enums.TileType;
 import model.BoardModel;
 
@@ -12,8 +14,10 @@ import java.awt.event.KeyListener;
 
 public class BoardPanel extends JPanel implements KeyListener {
     public JTable board;
+    private final GameController gameController;
 
-    public BoardPanel(BoardModel model) {
+    public BoardPanel(BoardModel model, GameController gameController) {
+        this.gameController = gameController;
         board = new JTable(model);
 
         // disable any interaction
@@ -40,6 +44,8 @@ public class BoardPanel extends JPanel implements KeyListener {
         }
 
         add(board);
+        setFocusable(true);
+        addKeyListener(this);
     }
 
     private int calculateRowColSize() {
@@ -75,7 +81,20 @@ public class BoardPanel extends JPanel implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_UP:
+                gameController.setDirection(Direction.UP);
+                break;
+            case KeyEvent.VK_DOWN:
+                gameController.setDirection(Direction.DOWN);
+                break;
+            case KeyEvent.VK_LEFT:
+                gameController.setDirection(Direction.LEFT);
+                break;
+            case KeyEvent.VK_RIGHT:
+                gameController.setDirection(Direction.RIGHT);
+                break;
+        }
     }
 
     @Override public void keyReleased(KeyEvent e) {}

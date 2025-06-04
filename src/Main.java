@@ -1,3 +1,4 @@
+import controller.MainController;
 import controller.MenuViewController;
 import model.AppModel;
 import view.MenuView;
@@ -21,9 +22,7 @@ public class Main {
 
 
         javax.swing.SwingUtilities.invokeLater(() -> {
-            AppModel model = new AppModel();
-            MenuView view = new MenuView();
-            new MenuViewController(model, view);
+            new MainController();
         });
     }
 }

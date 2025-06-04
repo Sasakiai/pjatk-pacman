@@ -22,7 +22,9 @@ public class PacmanThread extends Thread {
     }
 
     public void setDirection(Direction direction) {
-        this.direction = direction;
+        synchronized (directionLock) {
+            this.direction = direction;
+        }
     }
 
     public void stopThread() {
