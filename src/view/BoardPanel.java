@@ -49,7 +49,7 @@ public class BoardPanel extends JPanel implements KeyListener {
     }
 
     private int calculateRowColSize() {
-        return 16;
+        return 24;
     }
 
     private class CellRenderer extends DefaultTableCellRenderer {
@@ -59,16 +59,20 @@ public class BoardPanel extends JPanel implements KeyListener {
             tile.setOpaque(true);
 
             if (value instanceof TileType) {
-                System.out.println(value);
                 switch ((TileType) value) {
                     case EMPTY:
                         tile.setBackground(Color.BLACK);
+                        break;
+                    case DOT:
+                        tile.setBackground(Color.BLACK);
+                        tile.setLayout(new BorderLayout());
+                        tile.add(new DotPanel(), BorderLayout.CENTER);
                         break;
                     case WALL:
                         tile.setBackground(Color.BLUE);
                         break;
                     case PLAYER:
-                        tile.setBackground(Color.PINK);
+                        tile.setBackground(Color.YELLOW);
                         break;
                     default:
                         tile.setBackground(Color.BLACK);
@@ -76,6 +80,14 @@ public class BoardPanel extends JPanel implements KeyListener {
             }
 
             return tile;
+        }
+    }
+
+    private class DotPanel extends JLabel {
+        public DotPanel() {
+            setText("•");
+            setForeground(Color.WHITE);
+            setHorizontalAlignment(SwingConstants.CENTER);
         }
     }
 

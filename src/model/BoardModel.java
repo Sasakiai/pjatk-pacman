@@ -46,7 +46,7 @@ public class BoardModel extends AbstractTableModel {
     public void initBoard(int[][] maze) {
         for (int row = 0; row < maze.length; row++) {
             for (int col = 0; col < maze[0].length; col++) {
-                board[row][col] = maze[row][col] == 1 ? TileType.WALL : TileType.EMPTY;
+                board[row][col] = maze[row][col] == 1 ? TileType.WALL : TileType.DOT;
             }
         }
 

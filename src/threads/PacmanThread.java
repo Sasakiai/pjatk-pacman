@@ -1,11 +1,13 @@
 package threads;
 
+import controller.GameController;
 import enums.Direction;
 import enums.TileType;
 import model.BoardModel;
 
 public class PacmanThread extends Thread {
     private final BoardModel boardModel;
+    private final GameController gameController;
     private int currentRow;
     private int currentCol;
     private Direction direction;
@@ -13,8 +15,9 @@ public class PacmanThread extends Thread {
     private int moveInterval = 200;
     private boolean running = true;
 
-    public PacmanThread(BoardModel boardModel, int startRow, int startCol, Object directionLock) {
+    public PacmanThread(BoardModel boardModel, int startRow, int startCol, Object directionLock, GameController gameController) {
         this.boardModel = boardModel;
+        this.gameController = gameController;
         this.currentRow = startRow;
         this.currentCol = startCol;
         this.direction = Direction.NONE;
@@ -75,6 +78,10 @@ public class PacmanThread extends Thread {
                 if (newTile == TileType.WALL) {
                     continue;
                 }
+            }
+
+            if (newTile == TileType.DOT) {
+                gameController.addScore(10);
             }
 
             synchronized (boardModel) {
