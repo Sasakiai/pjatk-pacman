@@ -6,6 +6,7 @@ import model.BoardModel;
 import threads.GhostThread;
 import threads.PacmanThread;
 import threads.TimerThread;
+import view.GameOverView;
 import view.GameView;
 
 import java.util.ArrayList;
@@ -111,5 +112,6 @@ public class GameController {
     // othersss
     private void endGame() {
         gameView.dispose();
+        new GameOverView();
     }
 }
