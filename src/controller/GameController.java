@@ -111,6 +111,13 @@ public class GameController {
 
     // othersss
     private void endGame() {
+        pacmanThread.stopThread();
+        timerThread.stopThread();
+
+        for (GhostThread g : ghostThreads) {
+            g.stopThread();
+        }
+
         gameView.dispose();
         new GameOverView();
     }

@@ -23,6 +23,11 @@ public class GhostThread extends Thread {
         this.currentCol = startCol;
     }
 
+    public void stopThread() {
+        running = false;
+        interrupt();
+    }
+
     @Override
     public void run() {
         while (running) {

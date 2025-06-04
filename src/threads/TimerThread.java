@@ -12,6 +12,11 @@ public class TimerThread extends Thread {
         this.interval = interval;
     }
 
+    public void stopThread() {
+        running = false;
+        interrupt();
+    }
+
     @Override
     public void run() {
         while (running) {
