@@ -3,70 +3,74 @@ package model;
 import enums.TileType;
 
 import javax.swing.table.AbstractTableModel;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BoardModel extends AbstractTableModel {
     private final int rows;
     private final int cols;
     private final TileType[][] board;
+    private int pacmanRow;
+    private int pacmanCol;
+    private final List<int[]> ghostStarts = new ArrayList<int[]>();
 
-    public BoardModel(int rows, int cols) {
-        this.rows = rows;
-        this.cols = cols;
+    public BoardModel(int[][] maze) {
+        this.rows = maze.length;
+        this.cols = maze[0].length;
         board = new TileType[rows][cols];
-        generateMaze();
-    }
-
-    public void generateMaze() {
-        int[][] maze = {
-                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1},
-                {1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1},
-                {1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1},
-                {1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1},
-                {1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1},
-                {1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1},
-                {1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1},
-                {1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1},
-                {1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1},
-                {1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        };
 
         initBoard(maze);
     }
 
     public void initBoard(int[][] maze) {
-        for (int row = 0; row < maze.length; row++) {
-            for (int col = 0; col < maze[0].length; col++) {
-                board[row][col] = maze[row][col] == 1 ? TileType.WALL : TileType.DOT;
+        ghostStarts.clear();
+
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                int mazeTileValue = maze[row][col];
+
+                switch (mazeTileValue) {
+                    case 1:
+                        board[row][col] = TileType.WALL;
+                        break;
+                    case 2:
+                        board[row][col] = TileType.PLAYER;
+                        pacmanRow = row;
+                        pacmanCol = col;
+                        break;
+                    case 3:
+                        board[row][col] = TileType.GHOST;
+                        ghostStarts.add(new int[]{row, col});
+                        break;
+                    default:
+                        board[row][col] = TileType.DOT;
+                }
             }
         }
-
-        initPacMan();
     }
 
-    public void initPacMan() {
-        board[board.length/2][board[0].length/2] = TileType.PLAYER;
+    public int getPacmanRow() {
+        return this.pacmanRow;
     }
 
-    public int[] getEmptyTileCoords() {
-        for (int row = 0; row < board.length; row++) {
-            for (int col = 0; col < board[0].length; col++) {
-                if (board[row][col] == TileType.EMPTY || board[row][col] == TileType.DOT) {
-                    return new int[]{row, col};
+    public int getPacmanCol() {
+        return this.pacmanCol;
+    }
+
+    public List<int[]> getGhostStarts() {
+        return new ArrayList<int[]>(this.ghostStarts);
+    }
+
+    public boolean hasDots() {
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                if (board[row][col] == TileType.DOT) {
+                    return true;
                 }
             }
         }
 
-        return new int[]{-1, -1};
+        return false;
     }
 
     @Override

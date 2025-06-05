@@ -104,8 +104,11 @@ public class PacmanThread extends Thread {
                 continue;
             }
 
+            boolean collectedDot = false;
+
             if (newTile == TileType.DOT) {
                 gameController.addScore(10);
+                collectedDot = true;
             }
 
             synchronized (boardModel) {
@@ -114,6 +117,10 @@ public class PacmanThread extends Thread {
 
                 this.currentRow = newRow;
                 this.currentCol = newCol;
+            }
+
+            if (collectedDot) {
+                gameController.dotEaten();
             }
         }
 

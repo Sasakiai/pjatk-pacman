@@ -13,7 +13,6 @@ public class Main {
         manager.addKeyEventDispatcher(e -> {
             if (e.getID() == KeyEvent.KEY_PRESSED) {
                 if (e.isControlDown() && e.isShiftDown() && e.getKeyCode() == KeyEvent.VK_Q) {
-                    System.exit(0);
                 }
             }
 
