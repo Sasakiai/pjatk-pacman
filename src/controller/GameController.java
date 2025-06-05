@@ -116,6 +116,8 @@ public class GameController {
 
     // othersss
     private void endGame() {
+        gameView.dispose();
+
         pacmanThread.stopThread();
         timerThread.stopThread();
 
@@ -123,7 +125,6 @@ public class GameController {
             g.stopThread();
         }
 
-        gameView.dispose();
         new GameOverView(score, highScoreModel);
     }
 
