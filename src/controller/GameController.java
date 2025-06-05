@@ -3,6 +3,7 @@ package controller;
 import enums.Direction;
 import enums.TileType;
 import model.BoardModel;
+import model.HighScoreModel;
 import threads.GhostThread;
 import threads.PacmanThread;
 import threads.TimerThread;
@@ -14,6 +15,7 @@ import java.util.List;
 
 public class GameController {
     private final BoardModel boardModel;
+    private final HighScoreModel highScoreModel;
     private final GameView gameView;
     private final PacmanThread pacmanThread;
     private final TimerThread timerThread;
@@ -27,7 +29,8 @@ public class GameController {
 
     private final int ghostAmount = 2;
 
-    public GameController() {
+    public GameController(HighScoreModel highScoreModel) {
+        this.highScoreModel = highScoreModel;
         this.boardModel = new BoardModel(20, 20);
         this.gameView = new GameView(boardModel, this);
         this.pacmanThread = new PacmanThread(
@@ -121,7 +124,7 @@ public class GameController {
         }
 
         gameView.dispose();
-        new GameOverView();
+        new GameOverView(score, highScoreModel);
     }
 
     public void rescaleBoard() {

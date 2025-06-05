@@ -38,6 +38,16 @@ public class PacmanThread extends Thread {
 
     public void setCanMove(boolean canMove) {
         this.canMove = canMove;
+
+        setSelfOpacity();
+    }
+
+    public synchronized void setSelfOpacity() {
+        if (canMove) {
+            boardModel.setTile(currentRow, currentCol, TileType.PLAYER);
+        } else {
+            boardModel.setTile(currentRow, currentCol, TileType.PLAYER_HIT);
+        }
     }
 
     @Override

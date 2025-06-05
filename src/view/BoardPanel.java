@@ -90,6 +90,9 @@ public class BoardPanel extends JPanel implements KeyListener {
                     case PLAYER:
                         tile.setBackground(Color.YELLOW);
                         break;
+                    case PLAYER_HIT:
+                        tile.setBackground(new Color(1f, 1f, 0f, 0.5f));
+                        break;
                     case GHOST:
                         tile.setBackground(Color.RED);
                         break;

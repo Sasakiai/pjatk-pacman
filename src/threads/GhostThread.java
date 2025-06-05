@@ -68,6 +68,7 @@ public class GhostThread extends Thread {
 
                 if (newTile == TileType.PLAYER) {
                     gameController.playerHit();
+                    continue;
                 }
 
                 boardModel.setTile(currentRow, currentCol, previousTile);

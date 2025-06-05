@@ -1,6 +1,7 @@
 package view;
 
 import controller.GameController;
+import model.HighScoreModel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +10,7 @@ public class GameOverView extends JFrame {
     public JTextField nameField;
     public JButton submitBtn;
 
-    public GameOverView() {
+    public GameOverView(int score, HighScoreModel model) {
         setTitle("game over");
         setSize(300, 150);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -19,9 +20,13 @@ public class GameOverView extends JFrame {
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 10, 0, 10);
 
+        JLabel scoreLabel = new ScoreLabel(score);
         JLabel inputLabel = new InputLabel();
         nameField = new NameField();
         submitBtn = new SubmitBtn();
+
+        add(scoreLabel, gbc);
+        gbc.gridy++;
 
         add(inputLabel, gbc);
         gbc.gridy++;
@@ -32,11 +37,23 @@ public class GameOverView extends JFrame {
         add(submitBtn, gbc);
 
         submitBtn.addActionListener(e -> {
+            String name = nameField.getText().trim();
+
+            if (!name.isEmpty()) {
+                model.addHighScore(name, score);
+            }
+
             dispose();
         });
 
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+
+    private class ScoreLabel extends JLabel {
+        public ScoreLabel(int score) {
+            setText("Your score: " + score);
+        }
     }
 
     private class InputLabel extends JLabel {

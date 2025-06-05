@@ -5,6 +5,7 @@ public enum TileType {
     WALL,
     DOT,
     PLAYER,
+    PLAYER_HIT,
     GHOST,
     POWERUP
 }
