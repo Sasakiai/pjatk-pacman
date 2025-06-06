@@ -5,13 +5,17 @@ import enums.TileType;
 import model.BoardModel;
 import model.HighScoreModel;
 import model.MazeProvider;
+import powerups.PowerUp;
+import powerups.PowerUpFactory;
 import threads.GhostThread;
 import threads.PacmanThread;
+import threads.PowerUpThread;
 import threads.TimerThread;
 import view.GameOverView;
 import view.GameView;
 
-import java.util.ArrayList;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
 
 public class GameController {
@@ -22,6 +26,7 @@ public class GameController {
     private final GameView gameView;
     private final PacmanThread pacmanThread;
     private final TimerThread timerThread;
+    private final PowerUpThread powerUpThread;
     private final List<GhostThread> ghostThreads = new ArrayList<GhostThread>();
     private final Object directionLock = new Object();
     private int score;
@@ -30,7 +35,11 @@ public class GameController {
     private volatile boolean invincible = false;
     private final int invincibleTime = 2000;
 
-    private final int ghostAmount = 2;
+    private final Map<Point, PowerUp> powerUps = new HashMap<Point, PowerUp>();
+    private int scoreMult = 1;
+    private boolean hunger = false;
+    private boolean rainbow = false;
+    private boolean collector = false;
 
     public GameController(HighScoreModel highScoreModel) {
         this(highScoreModel, 0, 0, 3);
@@ -52,6 +61,7 @@ public class GameController {
                 this
         );
         this.timerThread = new TimerThread(this, 1000);
+        this.powerUpThread = new PowerUpThread(this);
 
 
         this.createGhosts();
@@ -61,6 +71,7 @@ public class GameController {
         this.gameView.boardPanel.requestFocusInWindow();
         this.pacmanThread.start();
         this.timerThread.start();
+        this.powerUpThread.start();
     }
 
     // player relatde
@@ -75,7 +86,7 @@ public class GameController {
     }
 
     public synchronized void addScore(int value) {
-        this.score += value;
+        this.score += value * scoreMult;
         this.gameView.boardInfoPanel.updateScore(score);
     }
 
@@ -88,13 +99,14 @@ public class GameController {
     private void createGhosts() {
         List<int[]> starts = boardModel.getGhostStarts();
 
-        for (int i = 0; i < ghostAmount && i < starts.size(); i++) {
+        for (int i = 0; i < starts.size(); i++) {
             int[] pos = starts.get(i);
             initGhost(pos[0], pos[1]);
         }
     }
 
     private void initGhost(int row, int col) {
+        System.out.println("Ghost added");
         GhostThread ghost = new GhostThread(boardModel, row, col, TileType.EMPTY, this);
         ghostThreads.add(ghost);
         ghost.start();
@@ -129,6 +141,95 @@ public class GameController {
         }).start();
     }
 
+    // powerup related
+    public void trySpawnPowerUps() {
+        Random r = new Random();
+
+        for (GhostThread g : ghostThreads) {
+            if (r.nextInt(100) < 25) {
+                PowerUp p = PowerUpFactory.getRandomPowerUp();
+                g.givePowerUp(p);
+            }
+        }
+    }
+
+    public synchronized void placePowerUp(int row, int col, PowerUp powerUp) {
+        powerUps.put(new Point(row, col), powerUp);
+        boardModel.setTile(row, col, TileType.POWERUP);
+    }
+
+    public synchronized void powerUpCollected(int row, int col) {
+        PowerUp powerUp = powerUps.remove(new Point(row, col));
+        boardModel.setTile(row, col, TileType.EMPTY);
+
+        if (powerUp != null) {
+            powerUp.apply(this);
+            gameView.boardInfoPanel.setPowerUpText(powerUp.getName());
+
+            new Thread(() -> {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+
+                }
+
+                powerUp.remove(this);
+                gameView.boardInfoPanel.clearPowerUpText();
+            });
+        }
+    }
+
+    public void ghostEatenAt(int row, int col) {
+        GhostThread ghostEaten = null;
+
+        for (GhostThread g : ghostThreads) {
+            if (g.getCurrentRow() == row && g.getCurrentCol() == row) {
+                ghostEaten = g;
+                break;
+            }
+        }
+
+        if (ghostEaten != null) {
+            ghostEaten.stopThread();
+            ghostThreads.remove(ghostEaten);
+            boardModel.setTile(row, col, TileType.EMPTY);
+        }
+    }
+
+    public void setScoreMult(int scoreMult) {
+        this.scoreMult = scoreMult;
+    }
+
+    public void setHunger(boolean hunger) {
+        this.hunger = hunger;
+    }
+
+    public boolean isHunger() {
+        return this.hunger;
+    }
+
+    public void setCollector(boolean collector) {
+        this.collector = collector;
+    }
+
+    public boolean isCollector() {
+        return this.collector;
+    }
+
+    public void setRainbow(boolean rainbow) {
+        this.rainbow = rainbow;
+    }
+
+    public Color getWallColor() {
+        if (rainbow) {
+            Random r = new Random();
+
+            return new Color(r.nextInt(256), r.nextInt(256), r.nextInt(256));
+        }
+
+        return Color.BLUE;
+    }
+
     // othersss
     private void loadNextMaze() {
         gameView.dispose();
@@ -155,6 +256,7 @@ public class GameController {
     private void stopThreads() {
         pacmanThread.stopThread();
         timerThread.stopThread();
+        powerUpThread.stopThread();
 
         for (GhostThread g : ghostThreads) {
             g.stopThread();

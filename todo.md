@@ -1,3 +1,12 @@
+czesci rzeczy sie nie udalo :(( za malo czasu w zyciu<br>
+repo jezeli Pan zainteresowany :D https://github.com/Sasakiai/pjatk-pacman
+
+nieukonczone rzeczy:
+- pole do ilosci wierszy/kolumn
+- algorytm do generacji labiryntu
+- A*/Dijkstra dla duchow
+- skalowalnosc okna
+
 # graphics:
     - player
     - ghosts

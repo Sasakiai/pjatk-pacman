@@ -4,6 +4,7 @@ import controller.GameController;
 import enums.Direction;
 import enums.TileType;
 import model.BoardModel;
+import powerups.PowerUp;
 
 import java.util.Random;
 
@@ -16,6 +17,7 @@ public class GhostThread extends Thread {
     private final Random random = new Random();
     private int moveInterval = 400;
     private boolean running = true;
+    private PowerUp heldPowerUp = null;
 
     public GhostThread(BoardModel boardModel, int startRow, int startCol, TileType previousTile, GameController gameController) {
         this.boardModel = boardModel;
@@ -28,6 +30,18 @@ public class GhostThread extends Thread {
     public void stopThread() {
         running = false;
         interrupt();
+    }
+
+    public int getCurrentRow() {
+        return this.currentRow;
+    }
+
+    public int getCurrentCol() {
+        return this.currentCol;
+    }
+
+    public void givePowerUp(PowerUp powerUp) {
+        this.heldPowerUp = powerUp;
     }
 
     @Override
@@ -71,7 +85,15 @@ public class GhostThread extends Thread {
                     continue;
                 }
 
-                boardModel.setTile(currentRow, currentCol, previousTile);
+                if (heldPowerUp != null) {
+                    System.out.println("PLACING POWER UP");
+                    boardModel.setTile(currentRow, currentCol, TileType.POWERUP);
+                    gameController.placePowerUp(currentRow, currentCol, heldPowerUp);
+                    heldPowerUp = null;
+                } else {
+                    boardModel.setTile(currentRow, currentCol, previousTile);
+                }
+
                 previousTile = (newTile == TileType.DOT ? newTile : TileType.EMPTY);
                 boardModel.setTile(newRow, newCol, TileType.GHOST);
 

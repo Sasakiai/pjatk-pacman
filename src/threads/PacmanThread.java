@@ -12,6 +12,7 @@ public class PacmanThread extends Thread {
     private int currentCol;
     private Direction direction;
     private Object directionLock;
+    private final int baseMoveInterval = 200;
     private int moveInterval = 200;
     private boolean running = true;
     private volatile boolean canMove = true;
@@ -34,6 +35,14 @@ public class PacmanThread extends Thread {
     public void stopThread() {
         running = false;
         interrupt();
+    }
+
+    public synchronized void setSpeedMultiplier(double multiplier) {
+        moveInterval = (int) (baseMoveInterval * multiplier);
+    }
+
+    public synchronized void resetSpeed() {
+        moveInterval = baseMoveInterval;
     }
 
     public void setCanMove(boolean canMove) {
@@ -100,8 +109,13 @@ public class PacmanThread extends Thread {
             }
 
             if (newTile == TileType.GHOST) {
-                gameController.playerHit();
-                continue;
+                if (gameController.isHunger()) {
+                    gameController.ghostEatenAt(newRow, newCol);
+                    newTile = TileType.EMPTY;
+                } else {
+                    gameController.playerHit();
+                    continue;
+                }
             }
 
             boolean collectedDot = false;
@@ -109,6 +123,10 @@ public class PacmanThread extends Thread {
             if (newTile == TileType.DOT) {
                 gameController.addScore(10);
                 collectedDot = true;
+            }
+
+            if (newTile == TileType.POWERUP) {
+                gameController.powerUpCollected(newRow, newCol);
             }
 
             synchronized (boardModel) {
@@ -121,6 +139,47 @@ public class PacmanThread extends Thread {
 
             if (collectedDot) {
                 gameController.dotEaten();
+            }
+
+            if (gameController.isCollector()) {
+                int rowBefore = this.currentRow;
+                int rowAfter = this.currentRow;
+                int colBefore = this.currentCol;
+                int colAfter = this.currentCol;
+
+                switch(directionCopy) {
+                    case UP:
+                        rowBefore++;
+                        rowAfter--;
+                        break;
+                    case DOWN:
+                        rowBefore--;
+                        rowAfter++;
+                    case LEFT:
+                        colBefore++;
+                        colAfter--;
+                    case RIGHT:
+                        colBefore--;
+                        colAfter++;
+                }
+
+                synchronized (boardModel) {
+                    if (rowAfter >= 0 && rowAfter < boardModel.getRowCount() && colAfter >= 0 && colAfter < boardModel.getColumnCount()) {
+                        if (boardModel.getTile(rowAfter, rowBefore) == TileType.DOT) {
+                            boardModel.setTile(rowAfter, colAfter, TileType.EMPTY);
+                            gameController.addScore(10);
+                            gameController.dotEaten();
+                        }
+                    }
+
+                    if (rowBefore >= 0 && rowBefore < boardModel.getRowCount() && colBefore >= 0 && colBefore < boardModel.getColumnCount()) {
+                        if (boardModel.getTile(rowBefore, colBefore) == TileType.DOT) {
+                            boardModel.setTile(rowBefore, colBefore, TileType.EMPTY);
+                            gameController.addScore(10);
+                            gameController.dotEaten();
+                        }
+                    }
+                }
             }
         }
 

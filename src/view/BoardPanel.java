@@ -85,7 +85,7 @@ public class BoardPanel extends JPanel implements KeyListener {
                         tile.add(new DotPanel(), BorderLayout.CENTER);
                         break;
                     case WALL:
-                        tile.setBackground(Color.BLUE);
+                        tile.setBackground(gameController.getWallColor());
                         break;
                     case PLAYER:
                         tile.setBackground(Color.YELLOW);
@@ -95,6 +95,9 @@ public class BoardPanel extends JPanel implements KeyListener {
                         break;
                     case GHOST:
                         tile.setBackground(Color.RED);
+                        break;
+                    case POWERUP:
+                        tile.setBackground(Color.MAGENTA);
                         break;
                     default:
                         tile.setBackground(Color.BLACK);
