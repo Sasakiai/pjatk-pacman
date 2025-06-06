@@ -94,7 +94,12 @@ public class GhostThread extends Thread {
                     boardModel.setTile(currentRow, currentCol, previousTile);
                 }
 
-                previousTile = (newTile == TileType.DOT ? newTile : TileType.EMPTY);
+                if (newTile == TileType.DOT || newTile == TileType.POWERUP) {
+                    previousTile = newTile;
+                } else {
+                    previousTile = TileType.EMPTY;
+                }
+
                 boardModel.setTile(newRow, newCol, TileType.GHOST);
 
 

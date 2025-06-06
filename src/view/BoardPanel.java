@@ -5,6 +5,7 @@ import enums.Direction;
 import enums.TileType;
 import model.BoardModel;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -13,14 +14,28 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 public class BoardPanel extends JPanel implements KeyListener {
     public JTable board;
     private final GameController gameController;
+    private BufferedImage pacmanUp;
+    private BufferedImage pacmanDown;
+    private BufferedImage pacmanLeft;
+    private BufferedImage pacmanRight;
+    private BufferedImage ghostImage;
 
     public BoardPanel(BoardModel model, GameController gameController) {
         this.gameController = gameController;
         setBackground(Color.BLACK);
+
+        try {pacmanUp = ImageIO.read(getClass().getResource("/pacmanUp.png"));} catch (IOException e) {}
+        try {pacmanDown = ImageIO.read(getClass().getResource("/pacmanDown.png"));} catch (IOException e) {}
+        try {pacmanRight = ImageIO.read(getClass().getResource("/pacmanRight.png"));} catch (IOException e) {}
+        try {pacmanLeft = ImageIO.read(getClass().getResource("/pacmanLeft.png"));} catch (IOException e) {}
+
+        try {ghostImage = ImageIO.read(getClass().getResource("/ghost.png"));} catch (IOException e) {}
 
         board = new JTable(model);
 
@@ -88,16 +103,37 @@ public class BoardPanel extends JPanel implements KeyListener {
                         tile.setBackground(gameController.getWallColor());
                         break;
                     case PLAYER:
-                        tile.setBackground(Color.YELLOW);
+                        tile.setBackground(Color.BLACK);
+                        BufferedImage pacmanImage;
+
+                        switch (gameController.getPacmanDirection()) {
+                            case UP: pacmanImage = pacmanUp; break;
+                            case DOWN: pacmanImage = pacmanDown; break;
+                            case LEFT: pacmanImage = pacmanLeft; break;
+                            default: pacmanImage = pacmanRight;
+                        }
+
+                        tile.setLayout(new BorderLayout());
+                        Image scaled = pacmanImage.getScaledInstance(table.getRowHeight(), table.getRowHeight(), Image.SCALE_SMOOTH);
+                        tile.add(new JLabel(new ImageIcon(scaled)), BorderLayout.CENTER);
+
                         break;
                     case PLAYER_HIT:
                         tile.setBackground(new Color(1f, 1f, 0f, 0.5f));
                         break;
                     case GHOST:
-                        tile.setBackground(Color.RED);
+                        tile.setBackground(Color.BLACK);
+
+                        if (ghostImage != null) {
+                            tile.setLayout(new BorderLayout());
+                            Image sscaled = ghostImage.getScaledInstance(table.getRowHeight(), table.getRowHeight(), Image.SCALE_SMOOTH);
+                            tile.add(new JLabel(new ImageIcon(sscaled)), BorderLayout.CENTER);
+                        }
                         break;
                     case POWERUP:
-                        tile.setBackground(Color.MAGENTA);
+                        tile.setBackground(Color.BLACK);
+                        tile.setLayout(new BorderLayout());
+                        tile.add(new PowerUpPanel(), BorderLayout.CENTER);
                         break;
                     default:
                         tile.setBackground(Color.BLACK);
@@ -112,6 +148,14 @@ public class BoardPanel extends JPanel implements KeyListener {
         public DotPanel() {
             setText("•");
             setForeground(Color.WHITE);
+            setHorizontalAlignment(SwingConstants.CENTER);
+        }
+    }
+
+    private class PowerUpPanel extends JLabel {
+        public PowerUpPanel() {
+            setText("•");
+            setForeground(Color.MAGENTA);
             setHorizontalAlignment(SwingConstants.CENTER);
         }
     }

@@ -40,6 +40,7 @@ public class GameController {
     private boolean hunger = false;
     private boolean rainbow = false;
     private boolean collector = false;
+    private boolean powerUpActive = false;
 
     public GameController(HighScoreModel highScoreModel) {
         this(highScoreModel, 0, 0, 3);
@@ -77,6 +78,10 @@ public class GameController {
     // player relatde
     public void setDirection(Direction direction) {
         this.pacmanThread.setDirection(direction);
+    }
+
+    public Direction getPacmanDirection() {
+        return this.pacmanThread.getDirection();
     }
 
     public void dotEaten() {
@@ -159,10 +164,15 @@ public class GameController {
     }
 
     public synchronized void powerUpCollected(int row, int col) {
+        if (powerUpActive) {
+            return;
+        }
+
         PowerUp powerUp = powerUps.remove(new Point(row, col));
         boardModel.setTile(row, col, TileType.EMPTY);
 
         if (powerUp != null) {
+            powerUpActive = true;
             powerUp.apply(this);
             gameView.boardInfoPanel.setPowerUpText(powerUp.getName() + ": " + powerUp.getDescription());
 
@@ -173,9 +183,10 @@ public class GameController {
 
                 }
 
+                powerUpActive = false;
                 powerUp.remove(this);
                 gameView.boardInfoPanel.clearPowerUpText();
-            });
+            }).start();
         }
     }
 
@@ -183,7 +194,7 @@ public class GameController {
         GhostThread ghostEaten = null;
 
         for (GhostThread g : ghostThreads) {
-            if (g.getCurrentRow() == row && g.getCurrentCol() == row) {
+            if (g.getCurrentRow() == row && g.getCurrentCol() == col) {
                 ghostEaten = g;
                 break;
             }
@@ -204,6 +215,10 @@ public class GameController {
         this.hunger = hunger;
     }
 
+    public void setSpeedMultiplier(double mult) {
+        pacmanThread.setSpeedMultiplier(mult);
+    }
+
     public boolean isHunger() {
         return this.hunger;
     }
@@ -216,9 +231,14 @@ public class GameController {
         return this.collector;
     }
 
+    public boolean isPowerUpActive() {
+        return this.powerUpActive;
+    }
+
     public void setRainbow(boolean rainbow) {
         this.rainbow = rainbow;
     }
+
 
     public Color getWallColor() {
         if (rainbow) {

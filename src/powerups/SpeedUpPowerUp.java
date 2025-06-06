@@ -15,11 +15,11 @@ public class SpeedUpPowerUp implements PowerUp {
 
     @Override
     public void apply(GameController gameController) {
-
+        gameController.setSpeedMultiplier(1.5);
     }
 
     @Override
     public void remove(GameController gameController) {
-
+        gameController.setSpeedMultiplier(1.0);
     }
 }

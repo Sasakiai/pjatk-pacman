@@ -32,6 +32,12 @@ public class PacmanThread extends Thread {
         }
     }
 
+    public Direction getDirection() {
+        synchronized (directionLock) {
+            return this.direction;
+        }
+    }
+
     public void stopThread() {
         running = false;
         interrupt();
@@ -39,10 +45,6 @@ public class PacmanThread extends Thread {
 
     public synchronized void setSpeedMultiplier(double multiplier) {
         moveInterval = (int) (baseMoveInterval * multiplier);
-    }
-
-    public synchronized void resetSpeed() {
-        moveInterval = baseMoveInterval;
     }
 
     public void setCanMove(boolean canMove) {
@@ -126,7 +128,11 @@ public class PacmanThread extends Thread {
             }
 
             if (newTile == TileType.POWERUP) {
-                gameController.powerUpCollected(newRow, newCol);
+                if (gameController.isPowerUpActive()) {
+                    continue;
+                } else {
+                    gameController.powerUpCollected(newRow, newCol);
+                }
             }
 
             synchronized (boardModel) {
