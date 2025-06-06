@@ -164,7 +164,7 @@ public class GameController {
 
         if (powerUp != null) {
             powerUp.apply(this);
-            gameView.boardInfoPanel.setPowerUpText(powerUp.getName());
+            gameView.boardInfoPanel.setPowerUpText(powerUp.getName() + ": " + powerUp.getDescription());
 
             new Thread(() -> {
                 try {
